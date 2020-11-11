@@ -23,5 +23,6 @@ jobs:
     - name: Run ARM deploy
       uses: azure/arm-deploy@v1
       with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ github.event.inputs.resourceGroupName }}
         template: ./Hands-on-Lab/templates/deploy-vm-existingrg.json
