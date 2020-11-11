@@ -53,7 +53,7 @@
         },
         "domainPassword": {
             "type": "securestring",
-            "defaultValue": "or-ita-ru.1026",
+            "defaultValue": "xxx",
             "metadata": {
                 "description": "ドメイン ユーザー パスワード"
             }
@@ -67,7 +67,7 @@
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "Password.1!!",
+            "defaultValue": "xxx",
             "metadata": {
                 "description": "ローカルの管理者のパスワード"
             }
