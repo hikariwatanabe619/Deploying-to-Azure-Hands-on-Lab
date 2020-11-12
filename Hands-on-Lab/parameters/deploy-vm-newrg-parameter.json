@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ResourceGroupName": {
+            "value": "MCW4"
+        },
+        "Location": {
+            "value": "japanwest"
+        },
+
+
+        "VirtualNetworkName": {
+            "value": "VNet2"
+        },
+        "VirtualNetworkAddressPrefix": {
+            "value": "10.2.0.0/16"
+        },
+        "AzureBastionSubnetName": {
+            "value": "AzureBastionSubnet"
+        },
+        "AzureBastionSubnetSubnetPrefix": {
+            "value": "10.2.0.0/24"
+        },
+        "VirtualMachineSubnetName": {
+            "value": "Subnet-1"
+        },
+        "VirtualMachineSubnetPrefix": {
+            "value": "10.2.1.0/24"
+        },
+
+
+        "AzureBastionHostName": {
+            "value": "AzureBastionHost"
+        },
+
+
+        "WebVirtualMachineName": {
+            "value": "Web-SVR"
+        },
+        "WebOSVersion": {
+            "value": "2019-Datacenter"
+        },
+        "WebVirtualMachineSize": {
+            "value": "Standard_D2_v3"
+        },
+
+
+        "SqlVirtualMachineName": {
+            "value": "SQL-SVR"
+        },
+        "SqlVersion": {
+            "value": "SQL2019-WS2019"
+        },
+        "SqlVirtualMachineSize": {
+            "value": "Standard_D2s_v3"
+        },
+
+
+        "AdminUsername": {
+            "value": "AzureUser"
+        },
+        "AdminPassword": {
+            "value": "Password.1!!"
+        },
+        "SqlAuthenticationLogin": {
+            "value": "SqlAuthenticationPassword"
+        }
+    }
+}
+
+
+
+
+
