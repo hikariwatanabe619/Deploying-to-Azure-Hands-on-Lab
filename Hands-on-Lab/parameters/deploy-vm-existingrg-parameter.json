@@ -24,13 +24,13 @@
             "value": "domainAdmin"
         },
         "domainPassword": {
-            "value": "or-ita-ru.1026"
+            "value": "xxx"
         },
         "adminUsername": {
             "value": "AzureUser"
         },
         "adminPassword": {
-            "value": "Password.1!!"
+            "value": "xxx"
         }
     }
 }
