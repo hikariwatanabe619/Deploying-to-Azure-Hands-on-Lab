@@ -2,19 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "ResourceGroupName": {
-          "type": "string",
-          "metadata": {
-            "description": "リソースグループ名"
-          }
-        },
-        "Location": {
-          "type": "string",
-          "metadata": {
-            "description": "リージョン"
-          }
-        },
-
 
         "VirtualNetworkName": {
             "type": "string",
@@ -131,6 +118,7 @@
 
 
     "variables": {
+        "Location": "[resourceGroup().location]",
         "SubnetRef": "[resourceID(resourceGroup().name, 'Microsoft.Network/virtualNetWorks/subnets', parameters('VirtualNetworkName'), parameters('VirtualMachineSubnetName'))]",
         "WebNetworkInterface": "[concat(parameters('WebVirtualMachineName'), '-nic')]",
         "SqlNetworkInterface": "[concat(parameters('SqlVirtualMachineName'), '-nic')]",
@@ -141,22 +129,10 @@
     "resources": [
 
         {
-            "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2019-10-01",
-            "name": "[parameters('ResourceGroupName')]",
-            "location": "[parameters('Location')]",
-            "properties": {}
-        },
-
-
-        {
             "apiVersion": "2018-10-01",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('VirtualNetworkName')]",
-            "location": "[parameters('Location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]"
-            ],
+            "location": "[variables('Location')]",
             "properties": {
                 "addressSpace": {
                 "addressPrefixes": [
@@ -171,7 +147,7 @@
                 "apiVersion": "2018-10-01",
                 "type": "subnets",
                 "name": "[parameters('AzureBastionSubnetName')]",
-                "location": "[parameters('Location')]",
+                "location": "[variables('Location')]",
                 "dependsOn": [
                     "[parameters('VirtualNetworkName')]"
                 ],
@@ -183,7 +159,7 @@
                 "apiVersion": "2018-10-01",
                 "type": "subnets",
                 "name": "[parameters('VirtualMachineSubnetName')]",
-                "location": "[parameters('Location')]",
+                "location": "[variables('Location')]",
                 "dependsOn": [
                     "[parameters('VirtualNetworkName')]",
                     "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('AzureBastionSubnetName'))]"
@@ -200,7 +176,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-07-01",
             "name": "[variables('WebNetworkInterface')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('VirtualMachineSubnetName'))]"
             ],
@@ -222,7 +198,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-07-01",
             "name": "[variables('SqlNetworkInterface')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('WebNetworkInterface'))]"
             ],
@@ -246,7 +222,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('AzureBastionIpAddress')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "sku": {
               "name": "Standard"
             },
@@ -258,7 +234,7 @@
             "type": "Microsoft.Network/bastionHosts",
             "apiVersion": "2019-04-01",
             "name": "[parameters('AzureBastionHostName')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('VirtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('AzureBastionSubnetName'))]",
@@ -286,7 +262,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
             "name": "[parameters('WebVirtualMachineName')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('WebNetworkInterface'))]"
             ],
@@ -332,7 +308,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
             "name": "[parameters('SqlVirtualMachineName')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('SqlNetworkInterface'))]"
             ],
@@ -378,7 +354,7 @@
             "type": "Microsoft.SqlVirtualMachine/SqlVirtualMachines",
             "apiVersion": "2017-03-01-preview",
             "name": "[parameters('SqlVirtualMachineName')]",
-            "location": "[parameters('Location')]",
+            "location": "[variables('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('SqlVirtualMachineName'))]"
             ],
