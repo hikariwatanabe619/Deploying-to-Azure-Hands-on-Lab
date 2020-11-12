@@ -8,7 +8,7 @@
         "subnetName": {
             "value": "Subnet-2"
         },
-        "virtualMachineName": {
+        "VirtualMachineName": {
             "value": "ARM-SVR2"
         },
         "OSVersion": {
