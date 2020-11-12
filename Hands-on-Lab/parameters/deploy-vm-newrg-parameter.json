@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "ResourceGroupName": {
-            "value": "MCW3"
+            "value": "MCW2"
         },
         "Location": {
             "value": "japanwest"
