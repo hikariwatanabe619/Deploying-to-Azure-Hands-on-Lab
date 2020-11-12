@@ -8,7 +8,7 @@ on:
       - 'Hands-on-Lab/parameters/deploy-vm-newrg-parameter.json'
 
 jobs:
-  deploy-vm:
+  deploy-resource:
     runs-on: ubuntu-latest
     
     steps:
