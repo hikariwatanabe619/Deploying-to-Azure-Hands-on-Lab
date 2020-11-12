@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Hands-on-Lab/parameters/**'
+      - 'Hands-on-Lab/parameters/deploy-vm-newrg-parameter.json'
 
 jobs:
   deploy-vm:
