@@ -58,7 +58,7 @@
         "SqlAuthenticationLogin": {
             "value": "SqlUser"
         },
-        "SqlAuthenticationLogin": {
+        "SqlAuthenticationPassword": {
             "value": "Password.1!!"
         }
     }
