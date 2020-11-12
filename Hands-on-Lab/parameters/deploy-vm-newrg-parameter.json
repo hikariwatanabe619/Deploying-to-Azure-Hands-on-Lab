@@ -56,7 +56,10 @@
             "value": "Password.1!!"
         },
         "SqlAuthenticationLogin": {
-            "value": "SqlAuthenticationPassword"
+            "value": "SqlUser"
+        },
+        "SqlAuthenticationLogin": {
+            "value": "Password.1!!"
         }
     }
 }
