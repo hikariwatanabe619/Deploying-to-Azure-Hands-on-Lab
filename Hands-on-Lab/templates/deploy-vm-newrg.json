@@ -18,42 +18,36 @@
 
         "VirtualNetworkName": {
             "type": "string",
-            "defaultValue": "VNet2",
             "metadata": {
                 "description": "仮想ネットワーク名"
             }
         },
         "VirtualNetworkAddressPrefix": {
             "type": "string",
-            "defaultValue": "10.2.0.0/16",
             "metadata": {
                 "description": "仮想ネットワークの IPv4 アドレス空間"
             }
         },
         "AzureBastionSubnetName": {
             "type": "string",
-            "defaultValue": "AzureBastionSubnet",
             "metadata": {
                 "description": "AzureBastionを展開するサブネット名"
             }
         },
         "AzureBastionSubnetSubnetPrefix": {
             "type": "string",
-            "defaultValue": "10.2.0.0/24",
             "metadata": {
                 "description": "AzureBastionサブネットのアドレス範囲"
             }
         },
         "VirtualMachineSubnetName": {
             "type": "string",
-            "defaultValue": "Subnet-1",
             "metadata": {
                 "description": "仮想マシンを展開するサブネット名"
             }
         },
         "VirtualMachineSubnetPrefix": {
             "type": "string",
-            "defaultValue": "10.2.1.0/24",
             "metadata": {
                 "description": "仮想マシンサブネットのアドレス範囲"
             }
@@ -62,7 +56,6 @@
 
         "AzureBastionHostName": {
             "type": "string",
-            "defaultValue": "AzureBastionHost",
             "metadata": {
                 "description": "Azure Bastion の名前"
             }
@@ -71,21 +64,18 @@
 
         "WebVirtualMachineName": {
             "type": "string",
-            "defaultValue": "Web-SVR",
             "metadata": {
                 "description": "Web サーバー名"
             }
         },
         "WebOSVersion": {
             "type": "string",
-            "defaultValue": "2019-Datacenter",
             "metadata": {
                 "description": "Web サーバーの OS バージョン"
             }
         },
         "WebVirtualMachineSize": {
             "type": "string",
-            "defaultValue": "Standard_D2_v3",
             "metadata": {
                 "description": "Web サーバーのインスタンス サイズ"
             }
@@ -94,21 +84,18 @@
 
         "SqlVirtualMachineName": {
             "type": "string",
-            "defaultValue": "SQL-SVR",
             "metadata": {
                 "description": "DB サーバー名"
             }
         },
         "SqlVersion": {
             "type": "string",
-            "defaultValue": "SQL2019-WS2019",
             "metadata": {
                 "description": "DB サーバーの OS と SQL バージョン"
             }
         },
         "SqlVirtualMachineSize": {
             "type": "string",
-            "defaultValue": "Standard_D2s_v3",
             "metadata": {
                 "description": "SQL サーバのインスタンス サイズ"
             }
@@ -117,28 +104,24 @@
 
         "AdminUsername": {
             "type": "string", 
-            "defaultValue": "AzureUser",
             "metadata": {
                 "description": "ローカルの管理者名"
             }
         },
         "AdminPassword": {
             "type": "securestring",
-            "defaultValue": "Password.1!!",
             "metadata": {
                 "description": "ローカルの管理者のパスワード"
             }
         },
         "SqlAuthenticationLogin": {
             "type": "string", 
-            "defaultValue": "SqlUser",
             "metadata": {
                 "description": "SQL 認証のユーザー名"
             }
         },
         "SqlAuthenticationPassword": {
             "type": "securestring",
-            "defaultValue": "Password.1!!",
             "metadata": {
                 "description": "SQL 認証のユーザーパスワード"
             }
@@ -157,12 +140,23 @@
 
     "resources": [
 
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2019-10-01",
+            "name": "[parameters('ResourceGroupName')]",
+            "location": "[parameters('Location')]",
+            "properties": {}
+        },
+
 
         {
             "apiVersion": "2018-10-01",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('VirtualNetworkName')]",
             "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]"
+            ],
             "properties": {
                 "addressSpace": {
                 "addressPrefixes": [
