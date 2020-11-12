@@ -1,0 +1,412 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ResourceGroupName": {
+          "type": "string",
+          "metadata": {
+            "description": "リソースグループ名"
+          }
+        },
+        "Location": {
+          "type": "string",
+          "metadata": {
+            "description": "リージョン"
+          }
+        },
+
+
+        "VirtualNetworkName": {
+            "type": "string",
+            "defaultValue": "VNet2",
+            "metadata": {
+                "description": "仮想ネットワーク名"
+            }
+        },
+        "VirtualNetworkAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.2.0.0/16",
+            "metadata": {
+                "description": "仮想ネットワークの IPv4 アドレス空間"
+            }
+        },
+        "AzureBastionSubnetName": {
+            "type": "string",
+            "defaultValue": "AzureBastionSubnet",
+            "metadata": {
+                "description": "AzureBastionを展開するサブネット名"
+            }
+        },
+        "AzureBastionSubnetSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.2.0.0/24",
+            "metadata": {
+                "description": "AzureBastionサブネットのアドレス範囲"
+            }
+        },
+        "VirtualMachineSubnetName": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "仮想マシンを展開するサブネット名"
+            }
+        },
+        "VirtualMachineSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.2.1.0/24",
+            "metadata": {
+                "description": "仮想マシンサブネットのアドレス範囲"
+            }
+        },
+
+
+        "AzureBastionHostName": {
+            "type": "string",
+            "defaultValue": "AzureBastionHost",
+            "metadata": {
+                "description": "Azure Bastion の名前"
+            }
+        },
+
+
+        "WebVirtualMachineName": {
+            "type": "string",
+            "defaultValue": "Web-SVR",
+            "metadata": {
+                "description": "Web サーバー名"
+            }
+        },
+        "WebOSVersion": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter",
+            "metadata": {
+                "description": "Web サーバーの OS バージョン"
+            }
+        },
+        "WebVirtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2_v3",
+            "metadata": {
+                "description": "Web サーバーのインスタンス サイズ"
+            }
+        },
+
+
+        "SqlVirtualMachineName": {
+            "type": "string",
+            "defaultValue": "SQL-SVR",
+            "metadata": {
+                "description": "DB サーバー名"
+            }
+        },
+        "SqlVersion": {
+            "type": "string",
+            "defaultValue": "SQL2019-WS2019",
+            "metadata": {
+                "description": "DB サーバーの OS と SQL バージョン"
+            }
+        },
+        "SqlVirtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "metadata": {
+                "description": "SQL サーバのインスタンス サイズ"
+            }
+        },
+
+
+        "AdminUsername": {
+            "type": "string", 
+            "defaultValue": "AzureUser",
+            "metadata": {
+                "description": "ローカルの管理者名"
+            }
+        },
+        "AdminPassword": {
+            "type": "securestring",
+            "defaultValue": "Password.1!!",
+            "metadata": {
+                "description": "ローカルの管理者のパスワード"
+            }
+        },
+        "SqlAuthenticationLogin": {
+            "type": "string", 
+            "defaultValue": "SqlUser",
+            "metadata": {
+                "description": "SQL 認証のユーザー名"
+            }
+        },
+        "SqlAuthenticationPassword": {
+            "type": "securestring",
+            "defaultValue": "Password.1!!",
+            "metadata": {
+                "description": "SQL 認証のユーザーパスワード"
+            }
+        }
+    },
+
+
+
+    "variables": {
+        "SubnetRef": "[resourceID(resourceGroup().name, 'Microsoft.Network/virtualNetWorks/subnets', parameters('VirtualNetworkName'), parameters('VirtualMachineSubnetName'))]",
+        "WebNetworkInterface": "[concat(parameters('WebVirtualMachineName'), '-nic')]",
+        "SqlNetworkInterface": "[concat(parameters('SqlVirtualMachineName'), '-nic')]",
+        "AzureBastionIpAddress": "[concat(parameters('AzureBastionHostName'), '-pip')]"
+    },
+
+
+    "resources": [
+
+
+        {
+            "apiVersion": "2018-10-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('VirtualNetworkName')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "addressSpace": {
+                "addressPrefixes": [
+                    "[parameters('VirtualNetworkAddressPrefix')]"
+                    ]
+                }
+            },
+    
+    
+            "resources": [
+            {
+                "apiVersion": "2018-10-01",
+                "type": "subnets",
+                "name": "[parameters('AzureBastionSubnetName')]",
+                "location": "[parameters('Location')]",
+                "dependsOn": [
+                    "[parameters('VirtualNetworkName')]"
+                ],
+                "properties": {
+                    "addressPrefix": "[parameters('AzureBastionSubnetSubnetPrefix')]"
+                }
+            },
+            {
+                "apiVersion": "2018-10-01",
+                "type": "subnets",
+                "name": "[parameters('VirtualMachineSubnetName')]",
+                "location": "[parameters('Location')]",
+                "dependsOn": [
+                    "[parameters('VirtualNetworkName')]",
+                    "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('AzureBastionSubnetName'))]"
+                ],
+                "properties": {
+                    "addressPrefix": "[parameters('VirtualMachineSubnetPrefix')]"
+                }
+            }
+            ]
+        },
+    
+
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "name": "[variables('WebNetworkInterface')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('VirtualMachineSubnetName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('SubnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "name": "[variables('SqlNetworkInterface')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('WebNetworkInterface'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('SubnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+
+
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('AzureBastionIpAddress')]",
+            "location": "[parameters('Location')]",
+            "sku": {
+              "name": "Standard"
+            },
+            "properties": {
+              "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "type": "Microsoft.Network/bastionHosts",
+            "apiVersion": "2019-04-01",
+            "name": "[parameters('AzureBastionHostName')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('VirtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('AzureBastionSubnetName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('AzureBastionIpAddress'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                    "name": "BastionIpconfig",
+                    "properties": {
+                        "subnet": {
+                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('AzureBastionSubnetName'))]"
+                        },
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('AzureBastionIpAddress'))]"
+                    }
+                    }
+                }
+                ]
+            }    
+        },
+
+
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('WebVirtualMachineName')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('WebNetworkInterface'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('WebVirtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "name": "[concat(parameters('WebVirtualMachineName'), '-OsDisk')]",
+                        "caching": "None",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[parameters('WebOSVersion')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WebNetworkInterface'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('WebVirtualMachineName')]",
+                    "adminUsername": "[parameters('AdminUsername')]",
+                    "adminPassword": "[parameters('AdminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVMAgent": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('SqlVirtualMachineName')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('SqlNetworkInterface'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('SqlVirtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "name": "[concat(parameters('SqlVirtualMachineName'), '-OsDisk')]",
+                        "caching": "None",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftSQLServer",
+                        "offer": "[parameters('SqlVersion')]",
+                        "sku": "Standard",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SqlNetworkInterface'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('SqlVirtualMachineName')]",
+                    "adminUsername": "[parameters('AdminUsername')]",
+                    "adminPassword": "[parameters('AdminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVMAgent": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.SqlVirtualMachine/SqlVirtualMachines",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[parameters('SqlVirtualMachineName')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('SqlVirtualMachineName'))]"
+            ],
+            "properties": {
+                "virtualMachineResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('SqlVirtualMachineName'))]",
+                "sqlManagement": "Full",
+                "sqlServerLicenseType": "PAYG",
+                "autoPatchingSettings": {
+                    "enable": false
+                },
+                "serverConfigurationsManagementSettings": {
+                    "sqlConnectivityUpdateSettings": {
+                        "connectivityType": "PRIVATE",
+                        "port": 1433,
+                        "sqlAuthUpdateUserName": "[parameters('SqlAuthenticationLogin')]",
+                        "sqlAuthUpdatePassword": "[parameters('SqlAuthenticationPassword')]"
+                    },
+                    "additionalFeaturesServerConfigurations": {
+                        "isRServicesEnabled": false
+                    }
+                }
+            }
+        }
+    ]
+}
